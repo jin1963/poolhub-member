@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Pool Hub Member</title>
+  <meta
+    name="description"
+    content="ระบบสมาชิก สะสมแต้ม และแลกรางวัลของ Pool Hub"
+  >
+
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <div id="loadingScreen" class="loading-screen">
+    <div class="spinner"></div>
+    <p>กำลังโหลดระบบ Pool Hub...</p>
+  </div>
+
+  <main class="page-shell">
+    <!-- บัตรสมาชิกสำหรับลูกค้า -->
+    <section id="publicCardPage" class="hidden">
+      <div class="public-card-container">
+        <div class="brand">
+          <div class="brand-mark">PH</div>
+
+          <div>
+            <p class="eyebrow">POOL HUB</p>
+            <h1>MEMBER CARD</h1>
+          </div>
+        </div>
+
+        <div id="publicMemberCard" class="member-card tier-bronze">
+          <div class="card-top">
+            <div>
+              <p class="card-label">POOL HUB MEMBER</p>
+              <h2 id="publicMemberName">กำลังโหลด...</h2>
+            </div>
+
+            <span id="publicTierBadge" class="tier-badge">BRONZE</span>
+          </div>
+
+          <div class="card-number">
+            <span>MEMBER NO.</span>
+            <strong id="publicMemberNumber">PH-000001</strong>
+          </div>
+
+          <div class="card-stats">
+            <div>
+              <span>คะแนนคงเหลือ</span>
+              <strong id="publicPoints">0</strong>
+            </div>
+
+            <div>
+              <span>คะแนนสะสมทั้งหมด</span>
+              <strong id="publicLifetimePoints">0</strong>
+            </div>
+          </div>
+
+          <p id="publicCardStatus" class="card-status">
+            บัตรสมาชิก Pool Hub
+          </p>
+        </div>
+
+        <p class="public-note">
+          เล่นพูลครบทุก 1 ชั่วโมง รับ 5 แต้ม
+        </p>
+      </div>
+    </section>
+
+    <!-- หน้าเข้าสู่ระบบพนักงาน -->
+    <section id="loginPage" class="auth-page hidden">
+      <div class="auth-card">
+        <div class="brand centered">
+          <div class="brand-mark">PH</div>
+
+          <div>
+            <p class="eyebrow">POOL HUB</p>
+            <h1>MEMBER SYSTEM</h1>
+          </div>
+        </div>
+
+        <p class="auth-intro">
+          ระบบจัดการสมาชิก สะสมแต้ม และแลกรางวัล
+        </p>
+
+        <form id="loginForm" class="form-stack">
+          <label>
+            อีเมลพนักงาน
+            <input
+              id="loginEmail"
+              type="email"
+              autocomplete="username"
+              placeholder="example@email.com"
+              required
+            >
+          </label>
+
+          <label>
+            รหัสผ่าน
+            <input
+              id="loginPassword"
+              type="password"
+              autocomplete="current-password"
+              placeholder="กรอกรหัสผ่าน"
+              required
+            >
+          </label>
+
+          <button type="submit" class="primary-button">
+            เข้าสู่ระบบ
+          </button>
+        </form>
+
+        <p id="loginMessage" class="message"></p>
+      </div>
+    </section>
+
+    <!-- หน้าจัดการหลัก -->
+    <section id="dashboardPage" class="dashboard-page hidden">
+      <header class="topbar">
+        <div class="brand">
+          <div class="brand-mark">PH</div>
+
+          <div>
+            <p class="eyebrow">POOL HUB</p>
+            <h1>MEMBER SYSTEM</h1>
+          </div>
+        </div>
+
+        <div class="user-panel">
+          <div>
+            <strong id="staffName">พนักงาน</strong>
+            <small id="staffRole">STAFF</small>
+          </div>
+
+          <button id="logoutButton" type="button" class="ghost-button">
+            ออกจากระบบ
+          </button>
+        </div>
+      </header>
+
+      <nav class="tab-bar" aria-label="เมนูหลัก">
+        <button
+          type="button"
+          class="tab-button active"
+          data-tab="membersPanel"
+        >
+          สมาชิก
+        </button>
+
+        <button
+          type="button"
+          class="tab-button"
+          data-tab="rewardsPanel"
+        >
+          ของรางวัล
+        </button>
+      </nav>
+
+      <!-- สมาชิก -->
+      <section id="membersPanel" class="tab-panel">
+        <div class="summary-grid">
+          <article class="summary-card">
+            <span>สมาชิกทั้งหมด</span>
+            <strong id="memberCount">0</strong>
+          </article>
+
+          <article class="summary-card">
+            <span>คะแนนที่มอบวันนี้</span>
+            <strong id="todayPoints">0</strong>
+          </article>
+
+          <article class="summary-card">
+            <span>อัตราค่าบริการ</span>
+            <strong>120 บาท/ชม.</strong>
+          </article>
+
+          <article class="summary-card">
+            <span>แต้มสมาชิก</span>
+            <strong>5 แต้ม/ชม.</strong>
+          </article>
+        </div>
+
+        <div class="content-grid">
+          <article class="panel">
+            <div class="panel-heading">
+              <div>
+                <p class="eyebrow">NEW MEMBER</p>
+                <h2>สมัครสมาชิกใหม่</h2>
+              </div>
+            </div>
+
+            <form id="memberForm" class="form-stack">
+              <label>
+                ชื่อสมาชิก
+                <input
+                  id="memberFullName"
+                  type="text"
+                  placeholder="ชื่อหรือนามแฝง"
+                  required
+                >
+              </label>
+
+              <label>
+                เบอร์โทรศัพท์
+                <input
+                  id="memberPhone"
+                  type="tel"
+                  placeholder="ไม่บังคับ"
+                >
+              </label>
+
+              <label>
+                LINE ID
+                <input
+                  id="memberLineId"
+                  type="text"
+                  placeholder="ไม่บังคับ"
+                >
+              </label>
+
+              <button type="submit" class="primary-button">
+                สร้างสมาชิกและ QR
+              </button>
+            </form>
+
+            <p id="memberFormMessage" class="message"></p>
+          </article>
+
+          <article class="panel">
+            <div class="panel-heading">
+              <div>
+                <p class="eyebrow">MEMBER LIST</p>
+                <h2>ค้นหาสมาชิก</h2>
+              </div>
+
+              <button
+                id="refreshMembersButton"
+                type="button"
+                class="ghost-button"
+              >
+                รีเฟรช
+              </button>
+            </div>
+
+            <label class="search-box">
+              <span>ค้นหาจากชื่อ เลขสมาชิก หรือเบอร์โทร</span>
+              <input
+                id="memberSearch"
+                type="search"
+                placeholder="พิมพ์เพื่อค้นหา..."
+              >
+            </label>
+
+            <div id="memberList" class="member-list"></div>
+          </article>
+        </div>
+      </section>
+
+      <!-- ของรางวัล -->
+      <section id="rewardsPanel" class="tab-panel hidden">
+        <div class="content-grid">
+          <article class="panel">
+            <div class="panel-heading">
+              <div>
+                <p class="eyebrow">NEW REWARD</p>
+                <h2>เพิ่มของรางวัล</h2>
+              </div>
+            </div>
+
+            <form id="rewardForm" class="form-stack">
+              <label>
+                ชื่อของรางวัล
+                <input
+                  id="rewardName"
+                  type="text"
+                  placeholder="เช่น ชอล์ก หรือกระเป๋าใส่คิว"
+                  required
+                >
+              </label>
+
+              <label>
+                คะแนนที่ใช้แลก
+                <input
+                  id="rewardPoints"
+                  type="number"
+                  min="1"
+                  step="1"
+                  required
+                >
+              </label>
+
+              <label>
+                จำนวนสินค้า
+                <input
+                  id="rewardStock"
+                  type="number"
+                  min="0"
+                  step="1"
+                  required
+                >
+              </label>
+
+              <label>
+                รายละเอียด
+                <textarea
+                  id="rewardDescription"
+                  rows="3"
+                  placeholder="ไม่บังคับ"
+                ></textarea>
+              </label>
+
+              <button type="submit" class="primary-button">
+                เพิ่มของรางวัล
+              </button>
+            </form>
+
+            <p id="rewardFormMessage" class="message"></p>
+          </article>
+
+          <article class="panel">
+            <div class="panel-heading">
+              <div>
+                <p class="eyebrow">REWARD LIST</p>
+                <h2>รายการของรางวัล</h2>
+              </div>
+
+              <button
+                id="refreshRewardsButton"
+                type="button"
+                class="ghost-button"
+              >
+                รีเฟรช
+              </button>
+            </div>
+
+            <div id="rewardList" class="reward-list"></div>
+          </article>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <!-- กล่องข้อมูลสมาชิก -->
+  <div
+    id="memberModal"
+    class="modal hidden"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="memberModalTitle"
+  >
+    <div class="modal-card">
+      <button
+        id="closeMemberModal"
+        type="button"
+        class="modal-close"
+        aria-label="ปิด"
+      >
+        ×
+      </button>
+
+      <div class="panel-heading">
+        <div>
+          <p class="eyebrow">MEMBER DETAILS</p>
+          <h2 id="memberModalTitle">ข้อมูลสมาชิก</h2>
+        </div>
+      </div>
+
+      <div id="selectedMemberCard" class="member-card tier-bronze">
+        <div class="card-top">
+          <div>
+            <p class="card-label">POOL HUB MEMBER</p>
+            <h2 id="selectedMemberName">-</h2>
+          </div>
+
+          <span id="selectedMemberTier" class="tier-badge">
+            BRONZE
+          </span>
+        </div>
+
+        <div class="card-number">
+          <span>MEMBER NO.</span>
+          <strong id="selectedMemberNumber">-</strong>
+        </div>
+
+        <div class="card-stats">
+          <div>
+            <span>คะแนนคงเหลือ</span>
+            <strong id="selectedMemberPoints">0</strong>
+          </div>
+
+          <div>
+            <span>คะแนนสะสมทั้งหมด</span>
+            <strong id="selectedMemberLifetimePoints">0</strong>
+          </div>
+        </div>
+      </div>
+
+      <div class="action-grid">
+        <section class="action-box">
+          <h3>เพิ่มเวลาเล่นและแต้ม</h3>
+
+          <label>
+            จำนวนนาทีที่เล่น
+            <input
+              id="playMinutes"
+              type="number"
+              min="1"
+              step="1"
+              value="60"
+            >
+          </label>
+
+          <div class="calculation-box">
+            <span>ค่าบริการโดยประมาณ</span>
+            <strong id="calculatedAmount">120 บาท</strong>
+
+            <span>แต้มที่จะได้รับ</span>
+            <strong id="calculatedPoints">5 แต้ม</strong>
+          </div>
+
+          <button
+            id="addPointsButton"
+            type="button"
+            class="primary-button"
+          >
+            ยืนยันการเพิ่มแต้ม
+          </button>
+        </section>
+
+        <section class="action-box">
+          <h3>แลกของรางวัล</h3>
+
+          <label>
+            เลือกของรางวัล
+            <select id="redeemRewardSelect">
+              <option value="">กำลังโหลด...</option>
+            </select>
+          </label>
+
+          <label>
+            จำนวน
+            <input
+              id="redeemQuantity"
+              type="number"
+              min="1"
+              step="1"
+              value="1"
+            >
+          </label>
+
+          <button
+            id="redeemButton"
+            type="button"
+            class="primary-button"
+          >
+            ยืนยันการแลกรางวัล
+          </button>
+        </section>
+
+        <section id="tierActionBox" class="action-box hidden">
+          <h3>เปลี่ยนระดับบัตร</h3>
+
+          <label>
+            ระดับสมาชิก
+            <select id="memberTierSelect">
+              <option value="bronze">Bronze</option>
+              <option value="silver">Silver</option>
+              <option value="gold">Gold</option>
+              <option value="platinum">Platinum</option>
+            </select>
+          </label>
+
+          <button
+            id="changeTierButton"
+            type="button"
+            class="primary-button"
+          >
+            บันทึกระดับบัตร
+          </button>
+        </section>
+      </div>
+
+      <section class="qr-section">
+        <div>
+          <h3>QR บัตรสมาชิก</h3>
+          <p>
+            ให้ลูกค้าสแกนเพื่อดูเลขสมาชิก ระดับบัตร และคะแนน
+          </p>
+
+          <a
+            id="memberCardLink"
+            class="text-link"
+            href="#"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            เปิดหน้าบัตรสมาชิก
+          </a>
+        </div>
+
+        <div id="memberQrCode" class="qr-code"></div>
+      </section>
+
+      <p id="memberActionMessage" class="message"></p>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
