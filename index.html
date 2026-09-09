@@ -35,6 +35,7 @@
         <button class="tab active" data-tab="members" type="button">สมาชิก</button>
         <button class="tab" data-tab="new-member" type="button">สมัครใหม่</button>
         <button class="tab" data-tab="rewards" type="button">ของรางวัล</button>
+        <button class="tab owner-only hidden" data-tab="invite" type="button">ลิงก์สมัคร</button>
       </nav>
       <section id="tab-members" class="tab-panel">
         <div class="section-head"><div><div class="eyebrow">MEMBERS</div><h2>รายชื่อสมาชิก</h2></div><button id="refreshBtn" class="ghost" type="button">รีเฟรช</button></div>
@@ -65,6 +66,27 @@
         </form>
         <div id="rewardList" class="reward-grid"></div>
       </section>
+      <section id="tab-invite" class="tab-panel hidden">
+        <div class="eyebrow">ONE-TIME SIGNUP LINK</div>
+        <h2>สร้างลิงก์สมัครสมาชิก</h2>
+        <div class="card">
+          <p class="muted">ใช้ส่งให้ลูกค้าหลังตรวจสอบค่าสมาชิกแล้ว ลิงก์ใช้ได้หนึ่งครั้งและหมดอายุใน 24 ชั่วโมง</p>
+          <button id="createInviteBtn" class="primary" type="button">สร้างลิงก์สมัคร</button>
+        </div>
+        <div id="inviteResult" class="hidden"></div>
+      </section>
+    </section>
+    <section id="signupView" class="auth-card hidden">
+      <div class="eyebrow">POOL HUB INVITATION</div>
+      <h2>สมัครสมาชิก Pool Hub</h2>
+      <p class="muted">กรอกข้อมูลให้ครบเพื่อรับเลขสมาชิกและ QR ประจำตัว</p>
+      <form id="signupForm" class="form-stack">
+        <label>ชื่อสมาชิก<input id="signupName" maxlength="100" required></label>
+        <label>เบอร์โทรศัพท์<input id="signupPhone" type="tel" inputmode="numeric" required></label>
+        <label>LINE ID <span class="optional">(ไม่บังคับ)</span><input id="signupLine" maxlength="100"></label>
+        <button class="primary" type="submit">ยืนยันการสมัคร</button>
+      </form>
+      <div id="signupResult" class="hidden"></div>
     </section>
   </main>
   <dialog id="memberDialog"><button class="dialog-close" type="button" aria-label="ปิด">×</button><div id="memberDialogBody"></div></dialog>
