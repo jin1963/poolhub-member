@@ -8,7 +8,10 @@ function busy(btn,on){if(!btn)return;if(on){btn.dataset.old=btn.textContent;btn.
 function cardUrl(token){return location.origin+location.pathname+"?card="+encodeURIComponent(token)}
 
 async function init(){
-  const token=new URLSearchParams(location.search).get("card");
+  const params=new URLSearchParams(location.search);
+  const signupToken=params.get("signup");
+  if(signupToken){publicSignup(signupToken);return}
+  const token=params.get("card");
   if(token){await publicCard(token);return}
   const out=await db.auth.getSession();
   if(out.data.session)await enterApp();
@@ -77,7 +80,7 @@ $("rewardForm").addEventListener("submit",async e=>{
 function openMember(id){
   const m=members.find(x=>x.id===id);if(!m)return;
   const opts=rewards.filter(r=>r.active&&r.stock>0).map(r=>'<option value="'+r.id+'">'+esc(r.name)+" — "+r.points_required+" แต้ม</option>").join("");
-  const tiers=["bronze","silver","gold","platinum"].map(t=>'<option value="'+t+'" '+(String(m.tier).toLowerCase()===t?"selected":"")+'>'+t.charAt(0).toUpperCase()+t.slice(1)+'</option>').join("");
+  const tiers=["Bronze","Silver","Gold","Platinum"].map(t=>'<option value="'+t+'" '+(String(m.tier).toLowerCase()===t.toLowerCase()?"selected":"")+'>'+t+'</option>').join("");
   $("memberDialogBody").innerHTML='<div class="detail-top"><div><div class="eyebrow">'+esc(m.member_no)+'</div><h2>'+esc(m.full_name)+'</h2><div class="muted">'+esc(m.tier)+(m.phone?" · "+esc(m.phone):"")+'</div></div><div class="detail-points">'+m.available_points+'<small> แต้ม</small></div></div><div class="action-block"><h3>เพิ่มแต้มค่าเล่นพูล</h3><form id="playForm" class="form-stack"><label>เวลาที่เล่น (นาที)<input id="playMinutes" type="number" min="1" placeholder="เช่น 90" required></label><label>ยอดชำระจริง (บาท)<input id="playAmount" type="number" min="0" step="0.01" placeholder="ไม่กรอกก็ได้"></label><button class="primary" type="submit">คำนวณและเพิ่มแต้ม</button></form></div><div class="action-block"><h3>แลกของรางวัล</h3><form id="redeemForm" class="form-stack"><label>เลือกของรางวัล<select id="rewardSelect" required><option value="">เลือก…</option>'+opts+'</select></label><label>จำนวน<input id="rewardQty" type="number" min="1" value="1" required></label><button class="ghost" type="submit">ยืนยันการแลก</button></form></div>'+(profile.role==="owner"?'<div class="action-block"><h3>ระดับสมาชิก</h3><form id="tierForm" class="form-stack"><select id="tierSelect">'+tiers+'</select><button class="mini" type="submit">บันทึกระดับ</button></form></div>':"")+'<div class="action-block"><div id="memberQr" class="qr"></div></div>';
   new QRCode($("memberQr"),{text:cardUrl(m.card_token),width:180,height:180});$("memberDialog").showModal();
   $("playForm").onsubmit=async e=>{e.preventDefault();busy(e.submitter,true);const a=$("playAmount").value;const out=await db.rpc("add_poolhub_play_points",{p_member_id:m.id,p_play_minutes:Number($("playMinutes").value),p_play_amount:a?Number(a):null});busy(e.submitter,false);if(out.error){notice(out.error.message,"error");return}notice(out.data.message||"เพิ่ม "+out.data.points_added+" แต้มเรียบร้อย");$("memberDialog").close();await loadMembers()};
@@ -85,6 +88,39 @@ function openMember(id){
   if($("tierForm"))$("tierForm").onsubmit=async e=>{e.preventDefault();busy(e.submitter,true);const out=await db.rpc("change_poolhub_member_tier",{p_member_id:m.id,p_tier:$("tierSelect").value});busy(e.submitter,false);if(out.error){notice(out.error.message,"error");return}notice("เปลี่ยนระดับสมาชิกแล้ว");$("memberDialog").close();await loadMembers()};
 }
 $("memberDialog").querySelector(".dialog-close").onclick=()=>$("memberDialog").close();
+
+$("createInviteBtn").onclick=async e=>{
+  busy(e.currentTarget,true);
+  const out=await db.rpc("create_poolhub_signup_invite");
+  busy(e.currentTarget,false);
+  if(out.error){notice(out.error.message,"error");return}
+  const url=location.origin+location.pathname+"?signup="+encodeURIComponent(out.data.token);
+  const el=$("inviteResult");el.className="result-card card";
+  el.innerHTML='<div class="eyebrow">SIGNUP LINK READY</div><h3>ลิงก์พร้อมส่งให้ลูกค้า</h3><p class="muted">หมดอายุ '+new Date(out.data.expires_at).toLocaleString("th-TH")+'</p><div id="inviteQr" class="qr"></div><button id="copyInviteLink" class="primary" type="button">คัดลอกลิงก์สมัคร</button>';
+  new QRCode($("inviteQr"),{text:url,width:180,height:180});
+  $("copyInviteLink").onclick=async()=>{await navigator.clipboard.writeText(url);notice("คัดลอกลิงก์สมัครแล้ว")};
+};
+
+function publicSignup(token){
+  $("loginView").classList.add("hidden");
+  $("signupView").classList.remove("hidden");
+  $("signupForm").onsubmit=async e=>{
+    e.preventDefault();busy(e.submitter,true);
+    const out=await db.rpc("register_poolhub_with_invite",{
+      p_token:token,
+      p_full_name:$("signupName").value.trim(),
+      p_phone:$("signupPhone").value.trim(),
+      p_line_id:$("signupLine").value.trim()||null
+    });
+    busy(e.submitter,false);
+    if(out.error){notice(out.error.message,"error");return}
+    $("signupForm").classList.add("hidden");
+    const m=out.data,url=cardUrl(m.card_token),el=$("signupResult");
+    el.className="result-card";
+    el.innerHTML='<div class="eyebrow">สมัครสำเร็จ</div><h2>'+esc(m.full_name)+'</h2><div class="member-no">'+esc(m.member_no)+'</div><p>ระดับ '+esc(m.tier)+' · '+m.available_points+' แต้ม</p><div id="signupQr" class="qr"></div><a class="primary" style="display:inline-block;text-decoration:none" href="'+url+'">เปิดบัตรสมาชิก</a>';
+    new QRCode($("signupQr"),{text:url,width:180,height:180});
+  };
+}
 
 async function publicCard(token){
   $("loginView").classList.add("hidden");const out=await db.rpc("get_poolhub_member_card",{p_card_token:token});const el=$("memberCardView");el.classList.remove("hidden");
