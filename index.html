@@ -16,80 +16,86 @@
     <header class="brandbar">
       <div class="brandmark">8</div>
       <div><h1>POOL HUB</h1><p>MEMBER · COMMUNITY · REWARDS</p></div>
-      <button id="logoutBtn" class="ghost hidden" type="button">ออกจากระบบ</button>
+      <div class="header-actions">
+        <div class="language-switch" aria-label="Language">
+          <button id="langTh" class="lang-btn active" type="button">TH</button>
+          <button id="langEn" class="lang-btn" type="button">EN</button>
+        </div>
+        <button id="logoutBtn" class="ghost hidden" type="button" data-i18n="logout">ออกจากระบบ</button>
+      </div>
     </header>
     <section id="notice" class="notice hidden" role="status"></section>
     <section id="loginView" class="auth-card">
-      <div class="eyebrow">STAFF ACCESS</div><h2>เข้าสู่ระบบพนักงาน</h2>
-      <p class="muted">ใช้บัญชี Owner หรือพนักงานที่สร้างไว้</p>
+      <div class="eyebrow">STAFF ACCESS</div><h2 data-i18n="staffLoginTitle">เข้าสู่ระบบพนักงาน</h2>
+      <p class="muted" data-i18n="staffLoginDesc">ใช้บัญชี Owner หรือพนักงานที่สร้างไว้</p>
       <form id="loginForm" class="form-stack">
-        <label>อีเมล<input id="email" type="email" autocomplete="username" required></label>
-        <label>รหัสผ่าน<input id="password" type="password" autocomplete="current-password" required></label>
-        <button class="primary" type="submit">เข้าสู่ระบบ</button>
+        <label><span data-i18n="email">อีเมล</span><input id="email" type="email" autocomplete="username" required></label>
+        <label><span data-i18n="password">รหัสผ่าน</span><input id="password" type="password" autocomplete="current-password" required></label>
+        <button class="primary" type="submit" data-i18n="login">เข้าสู่ระบบ</button>
       </form>
     </section>
     <section id="memberCardView" class="hidden"></section>
     <section id="appView" class="hidden">
-      <div class="userline"><div><span class="status-dot"></span><span id="staffName">กำลังโหลด…</span></div><span id="staffRole" class="pill"></span></div>
+      <div class="userline"><div><span class="status-dot"></span><span id="staffName" data-i18n="loading">กำลังโหลด…</span></div><span id="staffRole" class="pill"></span></div>
       <nav class="tabs">
-        <button class="tab active" data-tab="members" type="button">สมาชิก</button>
-        <button class="tab" data-tab="new-member" type="button">สมัครใหม่</button>
-        <button class="tab" data-tab="rewards" type="button">ของรางวัล</button>
-        <button class="tab owner-only hidden" data-tab="invite" type="button">ลิงก์สมัคร</button>
+        <button class="tab active" data-tab="members" type="button" data-i18n="membersTab">สมาชิก</button>
+        <button class="tab" data-tab="new-member" type="button" data-i18n="newMemberTab">สมัครใหม่</button>
+        <button class="tab" data-tab="rewards" type="button" data-i18n="rewardsTab">ของรางวัล</button>
+        <button class="tab owner-only hidden" data-tab="invite" type="button" data-i18n="inviteTab">ลิงก์สมัคร</button>
       </nav>
       <section id="tab-members" class="tab-panel">
-        <div class="section-head"><div><div class="eyebrow">MEMBERS</div><h2>รายชื่อสมาชิก</h2></div><button id="refreshBtn" class="ghost" type="button">รีเฟรช</button></div>
-        <input id="memberSearch" class="search" type="search" placeholder="ค้นหาชื่อ เบอร์โทร หรือเลขสมาชิก">
+        <div class="section-head"><div><div class="eyebrow">MEMBERS</div><h2 data-i18n="memberListTitle">รายชื่อสมาชิก</h2></div><button id="refreshBtn" class="ghost" type="button" data-i18n="refresh">รีเฟรช</button></div>
+        <input id="memberSearch" class="search" type="search" placeholder="ค้นหาชื่อ เบอร์โทร หรือเลขสมาชิก" data-i18n-placeholder="memberSearch">
         <div id="memberList" class="member-list"></div>
       </section>
       <section id="tab-new-member" class="tab-panel hidden">
-        <div class="eyebrow">NEW MEMBER</div><h2>สมัครสมาชิก</h2>
+        <div class="eyebrow">NEW MEMBER</div><h2 data-i18n="registerMember">สมัครสมาชิก</h2>
         <form id="memberForm" class="form-stack card">
-          <label>ชื่อสมาชิก<input id="memberName" required></label>
-          <label>เบอร์โทร<input id="memberPhone" inputmode="tel"></label>
-          <label>LINE ID <span class="optional">(ไม่บังคับ)</span><input id="memberLine"></label>
-          <button class="primary" type="submit">สร้างสมาชิกและ QR</button>
+          <label><span data-i18n="memberName">ชื่อสมาชิก</span><input id="memberName" required></label>
+          <label><span data-i18n="phone">เบอร์โทร</span><input id="memberPhone" inputmode="tel"></label>
+          <label>LINE ID <span class="optional" data-i18n="optional">(ไม่บังคับ)</span><input id="memberLine"></label>
+          <button class="primary" type="submit" data-i18n="createMemberQr">สร้างสมาชิกและ QR</button>
         </form>
         <div id="newMemberResult" class="hidden"></div>
       </section>
       <section id="tab-rewards" class="tab-panel hidden">
-        <div class="section-head"><div><div class="eyebrow">REWARDS</div><h2>ของรางวัล</h2></div></div>
+        <div class="section-head"><div><div class="eyebrow">REWARDS</div><h2 data-i18n="rewardsTitle">ของรางวัล</h2></div></div>
         <form id="rewardForm" class="form-stack card owner-only hidden">
-          <h3>เพิ่มของรางวัล</h3>
-          <label>ชื่อของรางวัล<input id="rewardName" required></label>
+          <h3 data-i18n="addReward">เพิ่มของรางวัล</h3>
+          <label><span data-i18n="rewardName">ชื่อของรางวัล</span><input id="rewardName" required></label>
           <div class="two-col">
-            <label>คะแนนที่ใช้<input id="rewardPoints" type="number" min="1" required></label>
-            <label>จำนวนคงเหลือ<input id="rewardStock" type="number" min="0" required></label>
+            <label><span data-i18n="pointsRequired">คะแนนที่ใช้</span><input id="rewardPoints" type="number" min="1" required></label>
+            <label><span data-i18n="stock">จำนวนคงเหลือ</span><input id="rewardStock" type="number" min="0" required></label>
           </div>
-          <label>รายละเอียด<input id="rewardDescription"></label>
-          <button class="primary" type="submit">เพิ่มของรางวัล</button>
+          <label><span data-i18n="description">รายละเอียด</span><input id="rewardDescription"></label>
+          <button class="primary" type="submit" data-i18n="addReward">เพิ่มของรางวัล</button>
         </form>
         <div id="rewardList" class="reward-grid"></div>
       </section>
       <section id="tab-invite" class="tab-panel hidden">
         <div class="eyebrow">ONE-TIME SIGNUP LINK</div>
-        <h2>สร้างลิงก์สมัครสมาชิก</h2>
+        <h2 data-i18n="createSignupLink">สร้างลิงก์สมัครสมาชิก</h2>
         <div class="card">
-          <p class="muted">ใช้ส่งให้ลูกค้าหลังตรวจสอบค่าสมาชิกแล้ว ลิงก์ใช้ได้หนึ่งครั้งและหมดอายุใน 24 ชั่วโมง</p>
-          <button id="createInviteBtn" class="primary" type="button">สร้างลิงก์สมัคร</button>
+          <p class="muted" data-i18n="inviteDesc">ใช้ส่งให้ลูกค้าหลังตรวจสอบค่าสมาชิกแล้ว ลิงก์ใช้ได้หนึ่งครั้งและหมดอายุใน 24 ชั่วโมง</p>
+          <button id="createInviteBtn" class="primary" type="button" data-i18n="createInvite">สร้างลิงก์สมัคร</button>
         </div>
         <div id="inviteResult" class="hidden"></div>
       </section>
     </section>
     <section id="signupView" class="auth-card hidden">
       <div class="eyebrow">POOL HUB INVITATION</div>
-      <h2>สมัครสมาชิก Pool Hub</h2>
-      <p class="muted">กรอกข้อมูลให้ครบเพื่อรับเลขสมาชิกและ QR ประจำตัว</p>
+      <h2 data-i18n="poolHubSignup">สมัครสมาชิก Pool Hub</h2>
+      <p class="muted" data-i18n="signupDesc">กรอกข้อมูลให้ครบเพื่อรับเลขสมาชิกและ QR ประจำตัว</p>
       <form id="signupForm" class="form-stack">
-        <label>ชื่อสมาชิก<input id="signupName" maxlength="100" required></label>
-        <label>เบอร์โทรศัพท์<input id="signupPhone" type="tel" inputmode="numeric" required></label>
-        <label>LINE ID <span class="optional">(ไม่บังคับ)</span><input id="signupLine" maxlength="100"></label>
-        <button class="primary" type="submit">ยืนยันการสมัคร</button>
+        <label><span data-i18n="memberName">ชื่อสมาชิก</span><input id="signupName" maxlength="100" required></label>
+        <label><span data-i18n="phone">เบอร์โทรศัพท์</span><input id="signupPhone" type="tel" inputmode="numeric" required></label>
+        <label>LINE ID <span class="optional" data-i18n="optional">(ไม่บังคับ)</span><input id="signupLine" maxlength="100"></label>
+        <button class="primary" type="submit" data-i18n="confirmSignup">ยืนยันการสมัคร</button>
       </form>
       <div id="signupResult" class="hidden"></div>
     </section>
   </main>
-  <dialog id="memberDialog"><button class="dialog-close" type="button" aria-label="ปิด">×</button><div id="memberDialogBody"></div></dialog>
+  <dialog id="memberDialog"><button class="dialog-close" type="button" aria-label="ปิด" data-i18n-aria="close">×</button><div id="memberDialogBody"></div></dialog>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
   <script src="config.js"></script>
