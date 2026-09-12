@@ -22,7 +22,7 @@ const I18N={
     pointsAdded:"เพิ่ม {count} แต้มเรียบร้อย",redeemed:"แลก {name} สำเร็จ",specialPointsAdded:"เพิ่ม {count} แต้มพิเศษเรียบร้อย ยอดใหม่ {balance} แต้ม",tierChanged:"เปลี่ยนระดับสมาชิกแล้ว",
     signupLinkReady:"ลิงก์สมัครพร้อมแล้ว",linkReadyForCustomer:"ลิงก์พร้อมส่งให้ลูกค้า",expires:"หมดอายุ {date}",copySignupLink:"คัดลอกลิงก์สมัคร",signupLinkCopied:"คัดลอกลิงก์สมัครแล้ว",
     signupSuccess:"สมัครสำเร็จ",tier:"ระดับ",openMemberCard:"เปิดบัตรสมาชิก",cardNotFound:"ไม่พบบัตรสมาชิก",contactStaff:"กรุณาติดต่อพนักงาน Pool Hub",pointsHistory:"ประวัติคะแนน",
-    noHistory:"ยังไม่มีประวัติ",genericError:"เกิดข้อผิดพลาด"
+    noHistory:"ยังไม่มีประวัติ",genericError:"เกิดข้อผิดพลาด",freeReferralSignup:"สมัครสมาชิกฟรีผ่านลิงก์แนะนำ",freeReferralDesc:"สมัครฟรีและรับเลขสมาชิก Pool Hub ได้ทันที",referralProgram:"โปรแกรมแนะนำสมาชิก",referralCount:"สมาชิกที่แนะนำ",referralPointsEarned:"แต้มแนะนำสะสม",copyReferralLink:"คัดลอกลิงก์แนะนำ",referralLinkCopied:"คัดลอกลิงก์แนะนำแล้ว",referralBonusAdded:" ผู้แนะนำได้รับเพิ่ม {count} แต้ม",invalidReferral:"ลิงก์แนะนำไม่ถูกต้องหรือหมดสิทธิ์ใช้งาน"
   },
   en:{
     logout:"Log out",staffLoginTitle:"Staff Login",staffLoginDesc:"Use an Owner or staff account",email:"Email",password:"Password",login:"Log in",loading:"Loading…",
@@ -39,7 +39,7 @@ const I18N={
     pointsAdded:"Added {count} points",redeemed:"Successfully redeemed {name}",specialPointsAdded:"Added {count} bonus points. New balance: {balance} points",tierChanged:"Member tier updated",
     signupLinkReady:"SIGNUP LINK READY",linkReadyForCustomer:"Link ready to send",expires:"Expires {date}",copySignupLink:"Copy Signup Link",signupLinkCopied:"Signup link copied",
     signupSuccess:"SIGNUP SUCCESSFUL",tier:"Tier",openMemberCard:"Open Member Card",cardNotFound:"Member Card Not Found",contactStaff:"Please contact Pool Hub staff",pointsHistory:"Points History",
-    noHistory:"No history yet",genericError:"An error occurred"
+    noHistory:"No history yet",genericError:"An error occurred",freeReferralSignup:"Free Signup by Referral",freeReferralDesc:"Join Pool Hub free and receive your member number instantly",referralProgram:"Member Referral Program",referralCount:"Referred Members",referralPointsEarned:"Referral Points Earned",copyReferralLink:"Copy Referral Link",referralLinkCopied:"Referral link copied",referralBonusAdded:" Referrer received {count} extra points",invalidReferral:"The referral link is invalid or inactive"
   }
 };
 function t(key,vars={}){let s=I18N[lang][key]??key;for(const [k,v] of Object.entries(vars))s=s.replaceAll("{"+k+"}",v);return s}
@@ -57,11 +57,14 @@ function notice(msg,type="success"){const e=$("notice");e.textContent=msg;e.clas
 function busy(btn,on){if(!btn)return;if(on){btn.dataset.old=btn.textContent;btn.textContent=t("saving");btn.disabled=true}else{btn.textContent=btn.dataset.old||btn.textContent;btn.disabled=false}}
 function publicUrl(type,token){const u=new URL(location.origin+location.pathname);u.searchParams.set(type,token);u.searchParams.set("lang",lang);return u.href}
 function cardUrl(token){return publicUrl("card",token)}
+function referralUrl(code){return publicUrl("ref",code)}
 $("langTh").onclick=()=>setLanguage("th");$("langEn").onclick=()=>setLanguage("en");applyLanguage();
 
 async function init(){
   const signupToken=pageParams.get("signup");
   if(signupToken){publicSignup(signupToken);return}
+  const referralCode=pageParams.get("ref");
+  if(referralCode){publicSignup(null,referralCode);return}
   const token=pageParams.get("card");
   if(token){await publicCard(token);return}
   const out=await db.auth.getSession();
@@ -135,9 +138,9 @@ function openMember(id){
   const ownerTools=profile.role==="owner"?'<div class="action-block"><h3>'+t("specialPointsOwner")+'</h3><form id="manualPointsForm" class="form-stack"><label>'+t("pointAmount")+'<input id="manualPoints" type="number" min="1" max="10000" placeholder="'+t("pointExample")+'" required></label><label>'+t("reason")+'<input id="manualNote" maxlength="200" placeholder="'+t("reasonExample")+'" required></label><button class="primary" type="submit">'+t("addSpecialPoints")+'</button></form></div><div class="action-block"><h3>'+t("memberTier")+'</h3><form id="tierForm" class="form-stack"><select id="tierSelect">'+tiers+'</select><button class="mini" type="submit">'+t("saveTier")+'</button></form></div>':"";
   $("memberDialogBody").innerHTML='<div class="detail-top"><div><div class="eyebrow">'+esc(m.member_no)+'</div><h2>'+esc(m.full_name)+'</h2><div class="muted">'+esc(m.tier)+(m.phone?" · "+esc(m.phone):"")+'</div></div><div class="detail-points">'+m.available_points+'<small> '+t("points")+'</small></div></div><div class="action-block"><h3>'+t("addPlayPoints")+'</h3><form id="playForm" class="form-stack"><label>'+t("playMinutes")+'<input id="playMinutes" type="number" min="1" placeholder="'+t("minutesExample")+'" required></label><label>'+t("paidAmount")+'<input id="playAmount" type="number" min="0" step="0.01" placeholder="'+t("optionalAmount")+'"></label><button class="primary" type="submit">'+t("calculatePoints")+'</button></form></div><div class="action-block"><h3>'+t("redeemReward")+'</h3><form id="redeemForm" class="form-stack"><label>'+t("chooseReward")+'<select id="rewardSelect" required><option value="">'+t("choose")+'</option>'+opts+'</select></label><label>'+t("quantity")+'<input id="rewardQty" type="number" min="1" value="1" required></label><button class="ghost" type="submit">'+t("confirmRedeem")+'</button></form></div>'+ownerTools+'<div class="action-block"><div id="memberQr" class="qr"></div></div>';
   new QRCode($("memberQr"),{text:cardUrl(m.card_token),width:180,height:180});$("memberDialog").showModal();
-  $("playForm").onsubmit=async e=>{e.preventDefault();busy(e.submitter,true);const a=$("playAmount").value;const out=await db.rpc("add_poolhub_play_points",{p_member_id:m.id,p_play_minutes:Number($("playMinutes").value),p_play_amount:a?Number(a):null});busy(e.submitter,false);if(out.error){notice(out.error.message,"error");return}notice(t("pointsAdded",{count:out.data.points_added}));$("memberDialog").close();await loadMembers()};
+  $("playForm").onsubmit=async e=>{e.preventDefault();busy(e.submitter,true);const a=$("playAmount").value;const out=await db.rpc("add_poolhub_play_points_with_referral",{p_member_id:m.id,p_play_minutes:Number($("playMinutes").value),p_play_amount:a?Number(a):null});busy(e.submitter,false);if(out.error){notice(out.error.message,"error");return}const bonus=Number(out.data.referral_bonus||0);notice(t("pointsAdded",{count:out.data.points_added})+(bonus?t("referralBonusAdded",{count:bonus}):""));$("memberDialog").close();await loadMembers()};
   $("redeemForm").onsubmit=async e=>{e.preventDefault();busy(e.submitter,true);const out=await db.rpc("redeem_poolhub_reward",{p_member_id:m.id,p_reward_id:$("rewardSelect").value,p_quantity:Number($("rewardQty").value)});busy(e.submitter,false);if(out.error){notice(out.error.message,"error");return}notice(t("redeemed",{name:out.data.reward_name}));$("memberDialog").close();await Promise.all([loadMembers(),loadRewards()])};
-  if($("manualPointsForm"))$("manualPointsForm").onsubmit=async e=>{e.preventDefault();busy(e.submitter,true);const out=await db.rpc("add_poolhub_owner_points",{p_member_id:m.id,p_points:Number($("manualPoints").value),p_note:$("manualNote").value.trim()});busy(e.submitter,false);if(out.error){notice(out.error.message,"error");return}notice(t("specialPointsAdded",{count:out.data.points_added,balance:out.data.balance_after}));$("memberDialog").close();await loadMembers()};
+  if($("manualPointsForm"))$("manualPointsForm").onsubmit=async e=>{e.preventDefault();busy(e.submitter,true);const out=await db.rpc("add_poolhub_service_points_with_referral",{p_member_id:m.id,p_points:Number($("manualPoints").value),p_note:$("manualNote").value.trim()});busy(e.submitter,false);if(out.error){notice(out.error.message,"error");return}const bonus=Number(out.data.referral_bonus||0);notice(t("specialPointsAdded",{count:out.data.points_added,balance:out.data.balance_after})+(bonus?t("referralBonusAdded",{count:bonus}):""));$("memberDialog").close();await loadMembers()};
   if($("tierForm"))$("tierForm").onsubmit=async e=>{e.preventDefault();busy(e.submitter,true);const out=await db.rpc("change_poolhub_member_tier",{p_member_id:m.id,p_tier:$("tierSelect").value});busy(e.submitter,false);if(out.error){notice(out.error.message,"error");return}notice(t("tierChanged"));$("memberDialog").close();await loadMembers()};
 }
 $("memberDialog").querySelector(".dialog-close").onclick=()=>$("memberDialog").close();
@@ -154,17 +157,21 @@ $("createInviteBtn").onclick=async e=>{
   $("copyInviteLink").onclick=async()=>{await navigator.clipboard.writeText(url);notice(t("signupLinkCopied"))};
 };
 
-function publicSignup(token){
+function publicSignup(token,referralCode=null){
   $("loginView").classList.add("hidden");
   $("signupView").classList.remove("hidden");
+  if(referralCode){
+    const title=$("signupView").querySelector("h2");
+    const desc=$("signupView").querySelector(".muted");
+    if(title)title.textContent=t("freeReferralSignup");
+    if(desc)desc.textContent=t("freeReferralDesc");
+  }
   $("signupForm").onsubmit=async e=>{
     e.preventDefault();busy(e.submitter,true);
-    const out=await db.rpc("register_poolhub_with_invite",{
-      p_token:token,
-      p_full_name:$("signupName").value.trim(),
-      p_phone:$("signupPhone").value.trim(),
-      p_line_id:$("signupLine").value.trim()||null
-    });
+    const params={p_full_name:$("signupName").value.trim(),p_phone:$("signupPhone").value.trim(),p_line_id:$("signupLine").value.trim()||null};
+    const out=referralCode
+      ?await db.rpc("register_poolhub_free_referral",{p_referral_code:referralCode,...params})
+      :await db.rpc("register_poolhub_with_invite",{p_token:token,...params});
     busy(e.submitter,false);
     if(out.error){notice(out.error.message,"error");return}
     $("signupForm").classList.add("hidden");
@@ -181,6 +188,8 @@ async function publicCard(token){
   const d=out.data;
   const history=(d.history||[]).map(x=>'<div class="member-row"><div><div class="member-name">'+esc(x.note||x.transaction_type)+'</div><div class="member-meta">'+formatDate(x.created_at)+'</div></div><div class="points">'+(x.points_change>0?"+":"")+x.points_change+'<small>'+t("points")+'</small></div></div>').join("");
   const prizes=(d.rewards||[]).map(r=>'<article class="reward-card"><strong>'+esc(r.name)+'</strong><div class="reward-points">'+r.points_required+' '+t("points")+'</div><div class="stock">'+t("inStock",{count:r.stock})+'</div></article>').join("");
-  el.innerHTML='<div class="member-card"><div class="eyebrow">PHL MEMBER</div><h2>'+esc(d.member.full_name)+'</h2><div class="member-meta">'+esc(d.member.member_no)+" · "+esc(d.member.tier)+'</div><div class="detail-points" style="margin-top:20px">'+d.member.available_points+'<small> '+t("points")+'</small></div></div><h2 style="margin-top:24px">'+t("rewardsTitle")+'</h2><div class="reward-grid">'+(prizes||'<div class="empty">'+t("noRewards")+'</div>')+'</div><h2 style="margin-top:24px">'+t("pointsHistory")+'</h2><div class="member-list">'+(history||'<div class="empty">'+t("noHistory")+'</div>')+"</div>";
+  const refUrl=referralUrl(d.member.referral_code);
+  el.innerHTML='<div class="member-card"><div class="eyebrow">PHL MEMBER</div><h2>'+esc(d.member.full_name)+'</h2><div class="member-meta">'+esc(d.member.member_no)+" · "+esc(d.member.tier)+'</div><div class="detail-points" style="margin-top:20px">'+d.member.available_points+'<small> '+t("points")+'</small></div></div><div class="card" style="margin-top:24px"><div class="eyebrow">REFERRAL</div><h2>'+t("referralProgram")+'</h2><div class="two-col"><div><div class="muted">'+t("referralCount")+'</div><div class="detail-points">'+Number(d.member.referral_count||0)+'</div></div><div><div class="muted">'+t("referralPointsEarned")+'</div><div class="detail-points">'+Number(d.member.referral_points_earned||0)+'</div></div></div><button id="copyPublicReferral" class="primary" type="button" style="margin-top:18px">'+t("copyReferralLink")+'</button></div><h2 style="margin-top:24px">'+t("rewardsTitle")+'</h2><div class="reward-grid">'+(prizes||'<div class="empty">'+t("noRewards")+'</div>')+'</div><h2 style="margin-top:24px">'+t("pointsHistory")+'</h2><div class="member-list">'+(history||'<div class="empty">'+t("noHistory")+'</div>')+"</div>";
+  $("copyPublicReferral").onclick=async()=>{await navigator.clipboard.writeText(refUrl);notice(t("referralLinkCopied"))};
 }
 init().catch(e=>notice(e.message||t("genericError"),"error"));
